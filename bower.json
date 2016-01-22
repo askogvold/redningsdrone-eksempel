@@ -1,0 +1,23 @@
+{
+  "name": "redningsdrone",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Arve Skogvold"
+  ],
+  "license": "ISC",
+  "moduleType": [],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "L.TileLayer.Kartverket": "~1.0.2",
+    "leaflet": "~0.7.7"
+  }
+}
