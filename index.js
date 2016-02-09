@@ -48,15 +48,20 @@ var currentInfo = function (date) {
     });
 };
 
+var sockets = new Set();
+
 wss.on('connection', function (ws) {
-    var id = setInterval(function () {
-        ws.send(currentInfo(new Date()));
-    }, 1000);
-
     console.log('websocket connection open');
-
+    sockets.add(ws);
+    
     ws.on('close', function () {
         console.log('websocket connection close');
-        clearInterval(id)
+        sockets.remove(ws);
     })
 });
+
+setInterval(function () {
+    sockets.forEach(function(ws) {
+    ws.send(currentInfo(new Date()));
+  });
+}, 1000);
