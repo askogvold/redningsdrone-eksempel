@@ -12,6 +12,7 @@
   "dependencies": {
     "bower": "^1.7.2",
     "express": "^4.13.4",
+    "file-tail": "^0.3.0",
     "ws": "^1.0.1"
   }
 }
