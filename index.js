@@ -1,4 +1,4 @@
-var mode = process.env.MODE || "example";
+var mode = process.env.MODE || "dev";
 
 var express = require('express');
 var WebSocketServer = require('ws').Server;
@@ -64,12 +64,16 @@ wss.on('connection', function (ws) {
     })
 });
 
-if (mode !== "production") {
+if (mode === "dev") {
     setInterval(function () {
         sockets.forEach(function (ws) {
             ws.send(JSON.stringify(currentInfo(new Date())));
         });
-    }, 1000);
+    }, 100);
+}
+
+if (mode === "example") {
+
 }
 
 // Start listening on meas messages
