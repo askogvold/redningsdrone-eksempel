@@ -1,4 +1,4 @@
-var mode="production";
+var mode = process.env.MODE || "example";
 
 var express = require('express');
 var WebSocketServer = require('ws').Server;
@@ -29,14 +29,14 @@ var currentInfo = function (date) {
     var signalPos = [61.937012, 10.480614];
 
     var ts = date.getTime();
-    var r = ts/1000.0 / 60.0 * Math.PI * 2;
+    var r = ts / 1000.0 / 60.0 * Math.PI * 2;
 
     var circleRadius = 0.1;
 
     var lat = signalPos[0] + Math.sin(r) * circleRadius;
-    var lon = signalPos[1] + Math.cos(r) * circleRadius / Math.cos(lat * Math.PI/180);
+    var lon = signalPos[1] + Math.cos(r) * circleRadius / Math.cos(lat * Math.PI / 180);
 
-    var dronePos = [lat,lon];
+    var dronePos = [lat, lon];
 
     return {
         drone: {
@@ -57,34 +57,35 @@ var sockets = new Set();
 wss.on('connection', function (ws) {
     console.log('websocket connection open');
     sockets.add(ws);
-    
+
     ws.on('close', function () {
         console.log('websocket connection close');
-        sockets.remove(ws);
+        sockets.delete(ws);
     })
 });
 
-if(mode !== "production") {
-setInterval(function () {
-    sockets.forEach(function(ws) {
-    ws.send(currentInfo(new Date()));
-  });
-}, 1000);
+if (mode !== "production") {
+    setInterval(function () {
+        sockets.forEach(function (ws) {
+            ws.send(JSON.stringify(currentInfo(new Date())));
+        });
+    }, 1000);
 }
 
 // Start listening on meas messages
 
+if (mode === "production") {
+    var ft = FileTail.startTailing('/var/log/meas_json/current');
 
-var ft = FileTail.startTailing('/var/log/meas_json/current');
+    ft.on('line', function (line) {
+        console.log('Received meas: ' + line);
+        var obj = JSON.parse(line);
+        var time = new Date(obj.time * 1000);
+        var msg = currentInfo(time);
+        msg.meas = obj;
+        sockets.forEach(function (ws) {
+            ws.send(JSON.stringify(msg));
+        });
 
-ft.on('line', function(line) {
-  console.log('Received meas: ' + line);
-  var obj = JSON.parse(line);
-  var time = new Date(obj.time * 1000);
-  var msg = currentInfo(time);
-  msg.meas = obj;
-  sockets.forEach(function(ws) {
-    ws.send(JSON.stringify(msg));
-  });
-  
-});
+    });
+}

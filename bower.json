@@ -17,6 +17,7 @@
     "tests"
   ],
   "dependencies": {
+    "bootstrap": "~3.3.6",
     "L.TileLayer.Kartverket": "~1.0.2",
     "leaflet": "~0.7.7"
   }
